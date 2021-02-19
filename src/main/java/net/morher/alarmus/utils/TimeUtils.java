@@ -28,7 +28,7 @@ public class TimeUtils {
     public static @Nullable Duration parseDuration(@Nullable String durationString) {
         if (durationString != null) {
             Duration duration = Duration.ZERO;
-            for (String part : durationString.split("\s+")) {
+            for (String part : durationString.split("\\s+")) {
                 duration = duration.plus(parseDurationPart(part));
             }
             return duration;
