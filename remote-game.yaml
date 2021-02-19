@@ -1,0 +1,6 @@
+
+serverUrl: ws://localhost:9080/api/socket
+
+
+game:
+    enable: true

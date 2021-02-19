@@ -16,7 +16,6 @@ import io.javalin.websocket.WsContext;
 import io.javalin.websocket.WsHandler;
 import io.javalin.websocket.WsMessageContext;
 import io.javalin.websocket.WsMessageHandler;
-import net.morher.alarmus.AlarmUsServer;
 import net.morher.alarmus.messages.AbstractMessager;
 import net.morher.alarmus.messages.MessageListener;
 import net.morher.alarmus.state.GamePhase;

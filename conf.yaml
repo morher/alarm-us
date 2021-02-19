@@ -1,0 +1,171 @@
+
+server:
+    port: 9080
+
+game:
+    enable: false
+
+scenes:
+    defs:
+        start:
+            phases:
+              - STARTING
+            initialFrame:
+                actions:
+                  - soundStart
+    
+        alarm:
+            phases: 
+              - CRITICAL
+              - CRUNCH
+            initialFrame:
+                next: high
+                duration: 1000
+            frames:              
+                high:
+                    attributes:
+                        displayAlarm: bright
+                        familyRoomWall: redBright
+                        diningTable: redBright
+                        hallways: redBright
+                        otherLights: redBright
+                    actions:
+                      - soundAlarm
+                    next: low
+                    duration: 1000
+                
+                low:
+                    attributes:
+                        displayAlarm: dark
+                        familyRoomWall: redDark
+                        diningTable: redDark
+                        hallways: redDark
+                        otherLights: redDark
+                    next: high
+                    duration: 1500
+    
+        winner:
+            phases:
+              - WON
+            initialFrame:
+                attributes:
+                    displayAlarm: off
+                    familyRoomWall: greenBright
+                    diningTable: greenBright
+                    hallways: greenBright
+                    otherLights: greenBright
+                actions:
+                  - soundWin
+                next: normal
+                duration: 10000
+            
+            frames:
+                normal:
+                    attributes:
+                        displayAlarm: off
+                        familyRoomWall: warmwhite
+                        diningTable: warmwhite
+                        hallways: warmwhite
+                        otherLights: off
+                        
+        looser:
+            phases:
+              - LOST
+            initialFrame:
+                attributes:
+                    displayAlarm: off
+                    familyRoomWall: greenBright
+                    diningTable: greenBright
+                    hallways: greenBright
+                    otherLights: greenBright
+                actions:
+                  - soundWin
+                next: normal
+                duration: 10000
+            
+            frames:
+                normal:
+                    attributes:
+                        displayAlarm: off
+                        familyRoomWall: warmwhite
+                        diningTable: warmwhite
+                        hallways: warmwhite
+                        otherLights: off
+                        
+        daytime:
+            phases:
+              - TASKS
+              - DONE
+            initialFrame:
+                attributes:
+                    displayAlarm: off
+                    familyRoomWall: warmwhite
+                    diningTable: warmwhite
+                    hallways: warmwhite
+                    otherLights: off
+
+
+sounds:
+    basePath: ./src/main/resources/public/sounds/
+    actions:
+        soundStart:
+            file: Roundstart_MAIN.wav
+        
+        soundAlarm:
+            file: Alarm_sabotage.wav
+        
+        soundWin:
+            file: victory_crew.wav
+        
+        soundLoose:
+            file: victory_impostor.wav
+    
+
+wizlight:
+    commonStyles:
+        off:
+            dimmed: 0
+            
+        warmwhite:
+            scene: 11
+            dimmed: 80
+            
+        greenBright:
+            rgb: [0, 255, 3]
+        
+        redBright:
+            rgb: [255, 0, 0]
+        
+        redDark:
+            rgb: [255, 0, 0]
+            dimmed: 10
+        
+    groups:
+        familyRoomWalleeeeee:
+            bulbs:
+              - BulbFamilyRoomWallN
+              - BulbFamilyRoomWallS
+            
+        diningTableeee:
+            bulbs:
+              - BulbDining0
+              - BulbDining1
+              - BulbDining2
+              - BulbDining3
+        
+        hallwaysee:
+            bulbs:
+              - BulbGarage
+              - BulbTerrace
+            
+            styles:
+                warmwhite:
+                    scene: 11
+                    dimmed: 30
+        
+        otherLights:
+            bulbs:
+              - BulbExtra1
+            styles:
+                warmwhite:
+                    dimmed: 0

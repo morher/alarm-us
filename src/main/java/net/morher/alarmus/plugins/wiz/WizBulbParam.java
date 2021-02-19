@@ -16,8 +16,12 @@ public class WizBulbParam {
     }
 
     public static WizBulbParam warmwhite() {
+        return scene(11);
+    }
+
+    public static WizBulbParam scene(int sceneId) {
         WizBulbParam param = new WizBulbParam();
-        param.sceneId = 11;
+        param.sceneId = sceneId;
         return param;
     }
 

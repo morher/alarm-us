@@ -1,4 +1,4 @@
-package net.morher.alarmus;
+package net.morher.alarmus.game;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -9,12 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.morher.alarmus.api.ServerMessage;
-import net.morher.alarmus.game.Game;
-import net.morher.alarmus.game.GameListener;
-import net.morher.alarmus.game.GameLoader;
 import net.morher.alarmus.handler.ClientMessageHandler;
 import net.morher.alarmus.handler.CoordinatorContext;
 import net.morher.alarmus.messages.AbstractMessager;
+import net.morher.alarmus.messages.MessageBroker;
 import net.morher.alarmus.scene.SceneListener;
 import net.morher.alarmus.state.GamePhase;
 import net.morher.alarmus.state.Player;
@@ -32,6 +30,16 @@ public class GameCoordinator extends AbstractMessager<ServerMessage> implements 
     public GameCoordinator addClientEventHandler(ClientMessageHandler handler) {
         this.eventHandlers.add(handler);
         return this;
+    }
+
+    public GameCoordinator configure(GameConfig game) {
+        return this;
+    }
+
+    public void connectAndStart(MessageBroker<ServerMessage> broker) {
+        connect(broker);
+        new Thread(this, "GameCoordinator")
+                .start();
     }
 
     @Override

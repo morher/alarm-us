@@ -2,6 +2,7 @@ package net.morher.alarmus.scene;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -10,6 +11,9 @@ import org.slf4j.LoggerFactory;
 
 import net.morher.alarmus.api.ServerMessage;
 import net.morher.alarmus.messages.AbstractMessager;
+import net.morher.alarmus.messages.MessageBroker;
+import net.morher.alarmus.scene.SceneManagerConfig.FrameDef;
+import net.morher.alarmus.scene.SceneManagerConfig.SceneDef;
 import net.morher.alarmus.state.GamePhase;
 import net.morher.alarmus.utils.StateObserver;
 
@@ -22,91 +26,63 @@ public class SceneManager extends AbstractMessager<ServerMessage> implements Run
     private static final Logger LOGGER = LoggerFactory.getLogger(SceneManager.class);
     private GamePhase phase;
     private Map<String, Scene> scenes = new HashMap<String, Scene>();
-    private Map<GamePhase, String> phaseToStringMap = new HashMap<>();
+    private Map<GamePhase, String> phaseToSceneMap = new HashMap<>();
     private final StateObserver<String> newScene = new StateObserver<>();
     private boolean running;
 
     public SceneManager() {
-        phaseToStringMap.put(GamePhase.STARTING, "start");
-
-        phaseToStringMap.put(GamePhase.CRITICAL, "alarm");
-        phaseToStringMap.put(GamePhase.CRUNCH, "alarm");
-
-        phaseToStringMap.put(GamePhase.TASKS, "daytime");
-        phaseToStringMap.put(GamePhase.DONE, "daytime");
-
-        phaseToStringMap.put(GamePhase.WON, "winner");
-        phaseToStringMap.put(GamePhase.LOST, "looser");
-
-        registerScene(new Scene("start")
-                .addFrame(new SceneFrame()
-                        .withAction("soundStart")));
-
-        registerScene(new Scene("alarm")
-                .addFrame(new SceneFrame("start")
-                        .nextFrame("high", 1000))
-
-                .addFrame(new SceneFrame("high")
-                        .changeAttribute("displayAlarm", "bright")
-                        .changeAttribute("familyRoomWall", "redBright")
-                        .changeAttribute("diningTable", "redBright")
-                        .changeAttribute("hallways", "redBright")
-                        .changeAttribute("otherLights", "redBright")
-                        .withAction("soundAlarm")
-                        .nextFrame("low", 1000))
-
-                .addFrame(new SceneFrame("low")
-                        .changeAttribute("displayAlarm", "dark")
-                        .changeAttribute("familyRoomWall", "redDark")
-                        .changeAttribute("diningTable", "redDark")
-                        .changeAttribute("hallways", "redDark")
-                        .changeAttribute("otherLights", "redDark")
-                        .nextFrame("high", 1500)));
-
-        registerScene(new Scene("winner")
-                .addFrame(new SceneFrame()
-                        .changeAttribute("displayAlarm", "off")
-                        .changeAttribute("familyRoomWall", "greenBright")
-                        .changeAttribute("diningTable", "greenBright")
-                        .changeAttribute("hallways", "greenBright")
-                        .changeAttribute("otherLights", "greenBright")
-                        .withAction("soundWin")
-                        .nextFrame("normal", 10000))
-                .addFrame(new SceneFrame("normal")
-                        .changeAttribute("displayAlarm", "off")
-                        .changeAttribute("familyRoomWall", "warmwhite")
-                        .changeAttribute("diningTable", "warmwhite")
-                        .changeAttribute("hallways", "warmwhite")
-                        .changeAttribute("otherLights", "off")));
-
-        registerScene(new Scene("looser")
-                .addFrame(new SceneFrame()
-                        .changeAttribute("displayAlarm", "off")
-                        .changeAttribute("familyRoomWall", "redBright")
-                        .changeAttribute("diningTable", "redBright")
-                        .changeAttribute("hallways", "redBright")
-                        .changeAttribute("otherLights", "redBright")
-                        .withAction("soundLoose")
-                        .nextFrame("normal", 5000))
-                .addFrame(new SceneFrame("normal")
-                        .changeAttribute("displayAlarm", "off")
-                        .changeAttribute("familyRoomWall", "warmwhite")
-                        .changeAttribute("diningTable", "warmwhite")
-                        .changeAttribute("hallways", "warmwhite")
-                        .changeAttribute("otherLights", "off")));
-
-        registerScene(new Scene("daytime")
-                .addFrame(new SceneFrame()
-                        .changeAttribute("displayAlarm", "off")
-                        .changeAttribute("familyRoomWall", "warmwhite")
-                        .changeAttribute("diningTable", "warmwhite")
-                        .changeAttribute("hallways", "warmwhite")
-                        .changeAttribute("otherLights", "off")));
     }
 
-    public void start() {
+    public SceneManager configure(SceneManagerConfig config) {
+        for (Entry<String, SceneDef> def : config.defs.entrySet()) {
+            SceneDef sceneDef = def.getValue();
+            String sceneName = def.getKey();
+            if (sceneDef.phases != null) {
+                for (GamePhase phase : sceneDef.phases) {
+                    phaseToSceneMap.put(phase, sceneName);
+                }
+            }
+            registerScene(createScene(sceneName, sceneDef));
+        }
+        return this;
+    }
+
+    private static Scene createScene(String name, SceneDef def) {
+        Scene scene = new Scene(name);
+        if (def.initialFrame != null) {
+            scene.addFrame(createFrame("default", def.initialFrame));
+        }
+        if (def.frames != null) {
+            for (Entry<String, FrameDef> frame : def.frames.entrySet()) {
+                scene.addFrame(createFrame(frame.getKey(), frame.getValue()));
+            }
+        }
+        return scene;
+    }
+
+    private static SceneFrame createFrame(String id, FrameDef def) {
+        SceneFrame frame = new SceneFrame(id);
+        if (def.attributes != null) {
+            for (Entry<String, String> attribute : def.attributes.entrySet()) {
+                frame.changeAttribute(attribute.getKey(), attribute.getValue());
+            }
+        }
+        if (def.actions != null) {
+            for (String action : def.actions) {
+                frame.withAction(action);
+            }
+        }
+        frame.setNextFrame(def.next);
+        frame.setNextFrameAfterMs(def.duration);
+        return frame;
+    }
+
+    public SceneManager connectAndStart(MessageBroker<ServerMessage> broker) {
+        connect(broker);
         new Thread(this, "SceneManager")
                 .start();
+
+        return this;
     }
 
     @Override
@@ -171,7 +147,7 @@ public class SceneManager extends AbstractMessager<ServerMessage> implements Run
 
     private void onNewPhase(GamePhase newPhase) {
         this.phase = newPhase;
-        String newSceneName = phaseToStringMap.get(phase);
+        String newSceneName = phaseToSceneMap.get(phase);
         if (newSceneName != null) {
             startScene(newSceneName);
         }

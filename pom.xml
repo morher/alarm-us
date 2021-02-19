@@ -47,7 +47,11 @@
 		    <artifactId>jackson-databind</artifactId>
 		    <version>2.11.1</version>
 		</dependency>
-		
+		<dependency>
+		    <groupId>com.fasterxml.jackson.dataformat</groupId>
+		    <artifactId>jackson-dataformat-yaml</artifactId>
+		    <version>2.12.1</version>
+		</dependency>
 		<dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>core</artifactId>

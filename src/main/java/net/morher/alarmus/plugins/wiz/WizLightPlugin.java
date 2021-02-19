@@ -6,12 +6,16 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.morher.alarmus.api.ServerMessage;
 import net.morher.alarmus.messages.AbstractMessager;
+import net.morher.alarmus.messages.MessageBroker;
+import net.morher.alarmus.plugins.wiz.WizLightConfig.BulbGroupDef;
+import net.morher.alarmus.plugins.wiz.WizLightConfig.StyleDef;
 
 public class WizLightPlugin extends AbstractMessager<ServerMessage> {
     private static final Logger LOGGER = LoggerFactory.getLogger(WizLightPlugin.class);
@@ -19,46 +23,48 @@ public class WizLightPlugin extends AbstractMessager<ServerMessage> {
     DatagramSocket socket;
 
     public WizLightPlugin() {
-
-        registerGroup(new LampGroup("familyRoomWall")
-                .addBulb("BulbFamilyRoomWallN")
-                .addBulb("BulbFamilyRoomWallS")
-                .putStyle("warmwhite", WizBulbParam.warmwhite().dimmed(100))
-                .putStyle("greenBright", WizBulbParam.rgb(0, 255, 3).dimmed(100))
-                .putStyle("redBright", WizBulbParam.rgb(255, 0, 0).dimmed(100))
-                .putStyle("redDark", WizBulbParam.rgb(255, 0, 0).dimmed(10)));
-
-        registerGroup(new LampGroup("diningTable")
-                .addBulb("BulbDining0")
-                .addBulb("BulbDining1")
-                .addBulb("BulbDining2")
-                .addBulb("BulbDining3")
-                .putStyle("warmwhite", WizBulbParam.warmwhite().dimmed(80))
-                .putStyle("greenBright", WizBulbParam.rgb(0, 255, 3).dimmed(100))
-                .putStyle("redBright", WizBulbParam.rgb(255, 0, 0).dimmed(100))
-                .putStyle("redDark", WizBulbParam.rgb(255, 0, 0).dimmed(10)));
-
-        registerGroup(new LampGroup("hallways")
-                .addBulb("BulbGarage")
-                .addBulb("BulbTerrace")
-                .putStyle("warmwhite", WizBulbParam.warmwhite().dimmed(30))
-                .putStyle("greenBright", WizBulbParam.rgb(0, 255, 3).dimmed(100))
-                .putStyle("redBright", WizBulbParam.rgb(255, 0, 0).dimmed(100))
-                .putStyle("redDark", WizBulbParam.rgb(255, 0, 0).dimmed(10)));
-
-        registerGroup(new LampGroup("otherLights")
-                .addBulb("BulbExtra1")
-                .putStyle("off", WizBulbParam.off())
-                .putStyle("greenBright", WizBulbParam.rgb(0, 255, 3).dimmed(100))
-                .putStyle("redBright", WizBulbParam.rgb(255, 0, 0).dimmed(100))
-                .putStyle("redDark", WizBulbParam.rgb(255, 0, 0).dimmed(10)));
-
         try {
             socket = new DatagramSocket();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public WizLightPlugin configure(WizLightConfig config) {
+        for (Entry<String, BulbGroupDef> group : config.groups.entrySet()) {
+            registerGroup(createGroup(group.getKey(), group.getValue(), config.commonStyles));
+        }
+        return this;
+    }
+
+    private static LampGroup createGroup(String name, BulbGroupDef def, Map<String, StyleDef> commonStyles) {
+        LampGroup group = new LampGroup(name);
+        for (String bulb : def.bulbs) {
+            group.addBulb(bulb);
+        }
+        for (Entry<String, StyleDef> style : commonStyles.entrySet()) {
+            group.putStyle(style.getKey(), createBulbParam(style.getValue()));
+        }
+        for (Entry<String, StyleDef> style : def.styles.entrySet()) {
+            group.putStyle(style.getKey(), createBulbParam(style.getValue()));
+        }
+        return group;
+    }
+
+    private static WizBulbParam createBulbParam(StyleDef def) {
+        if (def.rgb != null) {
+            return WizBulbParam
+                    .rgb(def.rgb[0], def.rgb[1], def.rgb[2])
+                    .dimmed(def.dimmed);
+
+        } else if (def.scene != null) {
+            return WizBulbParam
+                    .scene(def.scene)
+                    .dimmed(def.dimmed);
+        }
+
+        return WizBulbParam.off();
     }
 
     public WizLightPlugin registerGroup(LampGroup group) {
@@ -99,5 +105,10 @@ public class WizLightPlugin extends AbstractMessager<ServerMessage> {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    public WizLightPlugin connectAndStart(MessageBroker<ServerMessage> broker) {
+        connect(broker);
+        return this;
     }
 }

@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.morher.alarmus.messages.MessageBroker;
@@ -17,16 +18,22 @@ public class WebSocketClientMessageBroker<M> extends MessageBroker<M> implements
     private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketClientMessageBroker.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Client client;
-    private final Class<M> messageType;
+    private final JavaType type;
     private Completable disconnected = new Completable();
 
     public WebSocketClientMessageBroker(URI serverUri, Class<M> messageType) {
         this.client = new Client(serverUri);
-        this.messageType = messageType;
+        this.type = objectMapper.getTypeFactory().constructParametricType(WebSocketPacket.class, messageType);
+    }
+
+    public WebSocketClientMessageBroker<M> start() {
+        new Thread(this, "WebSocketClientMessageBroker")
+                .start();
+        return this;
     }
 
     @Override
-    public void run() {
+    public synchronized void run() {
         try {
             LOGGER.debug("Connecting...");
             disconnected = new Completable();
@@ -54,7 +61,7 @@ public class WebSocketClientMessageBroker<M> extends MessageBroker<M> implements
     public void sendEvent(M message) {
         if (client.isOpen()) {
             try {
-                client.send(objectMapper.writeValueAsString(message));
+                client.send(objectMapper.writeValueAsString(new WebSocketPacket(message)));
             } catch (JsonProcessingException e) {
 
                 LOGGER.warn("Failed to serialize message", message);
@@ -77,8 +84,11 @@ public class WebSocketClientMessageBroker<M> extends MessageBroker<M> implements
         @Override
         public void onMessage(String message) {
             try {
-                forwardMessage(objectMapper.readValue(message, messageType));
-
+                @SuppressWarnings("unchecked")
+                WebSocketPacket<M> packet = (WebSocketPacket<M>) objectMapper.readValue(message, type);
+                if (packet.getMessage() != null) {
+                    forwardMessage(packet.getMessage());
+                }
             } catch (Exception e) {
                 LOGGER.warn("Received invalid message: '{}'", message, e);
             }

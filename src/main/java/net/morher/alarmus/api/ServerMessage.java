@@ -81,6 +81,11 @@ public class ServerMessage {
         return this;
     }
 
+    public ServerMessage withSceneActions(String sceneAction) {
+        getSceneActions().add(sceneAction);
+        return this;
+    }
+
     public String getCompletedTaskToken() {
         return completedTaskToken;
     }
@@ -98,4 +103,5 @@ public class ServerMessage {
         this.hook = webhook;
         return this;
     }
+
 }
