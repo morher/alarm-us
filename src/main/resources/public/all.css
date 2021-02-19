@@ -1,0 +1,410 @@
+* {
+	box-sizing: border-box;
+}
+
+html, body {
+	font-size: 1.5vw;
+	font-family: 'Rubik', sans-serif;
+	fint-weight: 1500;
+ 	background: #000;
+	color: #fff;
+	-webkit-text-stroke: .06em #333;
+	width: 100 vw;
+	height: 100vh;
+	padding: 0;
+	margin: 0;
+	overflow: hidden;
+}
+
+#alarm {
+	position: absolute;
+	display: block;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	opacity: 0;
+	transition: opacity .05s;
+	background: #e31f12;
+	background: repeating-linear-gradient(
+		-20deg,
+		#e31f12,
+		#e31f12 5rem,
+		#c7251a 5rem,
+		#c7251a 12rem,
+		#e31f12 12rem,
+		#e31f12 17rem,
+		#c7251a 17rem,
+		#c7251a 24rem
+	);		
+}
+
+#alarm.view {
+	opacity: 1;
+}
+
+.inlineFig {
+	height: 1.2em;
+	width: 1.2em;
+}
+
+#task-counter {
+	position: absolute;
+	top: 1rem;
+	left: 1rem;
+	width: 20rem;
+	height: 1rem;
+	overflow: hidden;
+	font-size: .7rem;
+	background: #303e2d;
+	border: .1rem solid #000;
+	box-shadow:
+		0 0 0 .2rem #a7bbbb,
+		0 0 0 .3rem #000;
+}
+
+#task-counter span {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	padding: 0 .2rem;
+}
+#task-counter span[data-autofill] {
+	background: #43d93f;
+	padding: 0;
+	width: 15%;
+}
+
+#timeout {
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+}
+
+#tablet {
+	position: absolute;
+	top: 10%;
+	height: 80%;
+	left: 10%;
+	width: 80%;
+	background: #8f97a4;
+	border-radius: 1rem;
+	border: .2rem solid #191c21;
+	box-shadow: 
+		.1rem .1rem .3rem .1rem rgba(0,0,0,.5),
+		inset -.3rem -.3rem .3rem rgba(0,0,0,.3),
+		inset .3rem .3rem .3rem rgba(255,255,255,.3);
+}
+
+#home-button {
+	position: absolute;
+	right: 1rem;
+	top: 50%;
+	height: 2.6rem;
+	width: 2.6rem;
+	transform: translate(0, -1.3rem);
+	border-radius: 2.6rem;
+	border: #555 solid .2rem;
+	background: #fff;
+	box-shadow:
+		inset 0 0 .5rem .1rem rgba(0,0,0,.3),
+		0 0 .5rem .1rem rgba(255,255,255,.3);
+}
+
+#tabletscreen {
+	position: absolute;
+	top: 1.5rem;
+	left: 1.5rem;
+	right: 5rem;
+	bottom: 1.5rem;
+	border-radius: .5rem;
+	box-shadow:
+	  0 0 0 .1rem #3f5063,
+	  0 0 0 .4rem #535e69,
+	  0 0 0 .5rem #464b54
+	  ;
+}
+
+.devicescreen,
+#tabletscreen {
+		background: #bcd3ef;
+	background: repeating-linear-gradient(
+		-50deg,
+		#bcd3ef,
+		#bcd3ef 8rem,
+		#abc8e6 8rem,
+		#abc8e6 10rem,
+		#bcd3ef 10rem,
+		#bcd3ef 13rem,
+		#abc8e6 13rem,
+		#abc8e6 20rem
+	);
+	
+}
+
+.window {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	padding: 1rem .5rem;
+	visibility: hidden;
+}
+
+.window.show {
+	visibility: visible;
+}
+
+#tasks-screen {
+	display: flex;
+	flex-wrap: nowrap;
+}
+
+.box,
+.player,
+.taskconfimation {
+	border-radius: .4rem;
+	background: rgba(255,255,255,.7);
+	box-shadow: .2rem .2rem 0 0 rgba(0,0,0,.3);
+	padding: .5rem;
+	margin: 0 .5rem;
+}
+
+.player {	
+	display: inline-block;
+	width: 20rem;
+}
+
+
+#victory,
+#defeat {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: #000;
+}
+
+#victory h1,
+#defeat h1 {
+	font-family: 'Press Start 2P', cursive;
+    font-size: 4rem;
+    font-weight: 400;
+    color: #018bfb;
+    top: 40px;
+    -webkit-text-stroke: initial;
+}
+
+#victory .background,
+#defeat .background {
+    width: 70vw;
+    height: .1vh;
+    top: 60vh;
+    left: 15vw;
+    background: #59a4a3;
+    position: absolute;
+    border-radius: 50%;
+    box-sizing: border-box;
+    box-shadow: 6px 6px 80px 110px #59a4a3;
+}
+
+#defeat h1 {
+    color: #e31114;
+}
+
+#defeat .background {
+    background: #9e050a;
+    box-shadow: 6px 6px 80px 110px #9e050a;
+}
+
+#victory.view:before,
+#defeat.view:before{
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, #000, #000);
+  z-index: 30;
+  animation: animate 2s linear forwards;
+}
+@keyframes animate{
+  0%{
+    right: 0;
+  }
+  100%{
+    right: -200%;
+  }
+}
+
+.playerlist {
+	position: absolute;
+	display: block;
+	top: 55%;
+	left: 0;
+	right: 0;
+	text-align: center;
+}
+
+.playerlist div {
+	display: inline-block;
+	position: relative;
+	width: 12rem;
+}
+
+.playerlist div img {
+	width: 100%;
+}
+
+h1 {
+	text-align: center;
+}
+
+h2 {
+	margin-bottom: .5em;
+}
+
+h3 {
+	-webkit-text-stroke: initial;
+	color: #5d656c;
+	font-size: 1em;
+	margin-bottom: .5em;
+}
+
+ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+li {
+	margin: .5em 0;
+}
+
+.completed {
+	color: #159716;
+}
+
+.icon {
+	-webkit-text-stroke: initial;
+}
+
+@keyframes pulse {
+	0% {
+		color: #fff;
+	}
+
+	70% {
+		color: #159716;
+	}
+
+	100% {
+		color: #fff;
+	}
+}
+
+.completing {
+	animation: pulse 1s infinite;
+}
+
+.conditional,
+*[data-show-in-phases],
+*[data-hide-in-phases],
+*[data-show-attribute] {
+	display: none;
+}
+
+
+.view {
+	display: initial;
+}
+
+*[data-show-if-signed-in] {
+	visibility: hidden;
+}
+
+.show {
+	visibility: visible;
+}
+
+.center {
+	text-align: center;
+}
+
+button {
+	color: #888;
+	border: .2rem solid #888;
+	background: #ccc;
+	font-weight: bold;
+	border-radius: .3rem;
+	font-size: .9rem;
+	padding: 1rem;
+	-webkit-text-stroke: initial;
+	width: 10rem;
+	text-align: center;
+	margin: 0 1rem;
+	appearance: none;
+}
+button.yes {
+	color: #476a5d;
+	border-color: #476a5d;
+	background: #afd5c5;
+}
+button.no {
+	color: #74404a;
+	border-color: #74404a;
+	background: #ebb3b8;
+}
+
+.folder,
+.file {
+	background: url('/images/folder.svg') no-repeat center top;
+	background-size: 5rem 5rem;
+	padding-top: 5rem;
+	width: 8rem;
+	text-align: center;
+}
+
+.file {
+	background-image: url('/images/file.svg');
+}
+
+.popup {
+	visibility: hidden;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	min-height: 10rem;
+	min-width: 60%;
+	background: #9acbae;
+	border: .2rem solid #333;
+	box-shadow: .1rem .1rem 1rem .1rem rgba(0,0,0,.3);
+	transform: translateX(-50%) translateY(-50%);
+	padding: 1rem;
+}
+
+.popup.show {
+	visibility: visible;
+}
+
+#scanQuest .icon {
+	height: 10rem;
+}
+
+.popup h1 {
+	margin: -1rem -1rem 1rem -1rem;
+	padding: 0 1rem;
+	font-size: 1em;
+	font-weight: normal;
+	line-height: 1.5em;
+	-webkit-text-stroke: initial;
+	color: #333;
+	background: #fff;
+	border-bottom: .1rem solid #333;
+	text-align: left;
+}
+

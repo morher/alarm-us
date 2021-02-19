@@ -1,0 +1,11 @@
+{
+	"short_name": "Alarm Us",
+	"name": "Alarm Us",
+	"icon": {
+		"src": "/icon.png",
+		"sizes": "256x256",
+		"type": "image/png"
+	},
+	"display": "fullscreen",
+	"orientation": "landscape"
+}

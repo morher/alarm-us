@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Alarm US - Control</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="theme-color" content="#000">
+	<link rel="manifest" href="/manifest.json">
+	
+	<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@700&display=swap" rel="stylesheet">
+	<link href="/all.css" rel="stylesheet">
+	
+	<script src="/js/instascan.min.js"></script>
+	<script src="/gameclient.js"></script>
+	<script src="/js/device.js"></script>
+</head>
+<body class="devicescreen">
+	
+	<div data-show-if-signed-in="false" class="box" onclick="signIn()" style="position: absolute; bottom: 3rem; left: 3rem; right: 3rem; text-align: center;">
+		<h1>Sign in</h1>
+		<p>Click to scan card</p>
+	</div>
+	
+	<div data-show-if-signed-in="true" class="box" style="position: absolute; top: 1rem; left: 1rem; width: 15rem; bottom: 1rem;">
+		<h2 onclick="signOut()"><img src="figs/fig-red.svg" class="inlineFig" data-autofill="currentUser-fig" /> <span data-autofill="currentUser-displayName"></span></h2>
+		<div data-hide-in-phases="IDLE,PREGAME">
+			<h3>Remaining time</h3>
+			<span data-autofill="gameTimeout">0:00</span>
+		</div>
+		<div id="playerTasks" data-hide-in-phases="IDLE,PREGAME">
+		</div>
+	</div>
+	
+	<div data-show-if-signed-in="true" id="files" class="box" style="position: absolute; top: 1rem; left: 17rem; right: 1rem; bottom: 1rem; padding: 1rem; display: flex;">
+		<div class="folder" onclick="downloadFile()">Download file</div>
+		<!--div class="file">Upload file</div-->
+	</div>
+
+	<div class="popup" id="scanPopup" style="height: 70%; width: 70%;">
+		<h1>Scanning...</h1>
+		<div id="scanPreview" style="position: absolute; left: 1rem; top: 2.5rem; bottom: 1rem; right: 20rem; background: #888;">
+			<video id="preview" style="width: 100%; height: 100%; object-fit: cover; overflow: hidden;" muted="true" playsinline="playsinline" autoplay="autoplay"></video>		
+		</div>
+		<div id="scanQuest" style="position:absolute; top: 2.5rem; right: 1rem; width: 18rem; bottom: 1rem; text-align: center">
+			
+		</div>
+		<button id="scanCancel" style="position: absolute; right: 0rem; bottom: 1rem;">
+			Cancel
+		</button>
+	</div>
+
+	<div id="victory"  data-show-in-phases="WON">
+		<h1>Victory</h1>
+		<div class="background"></div>
+	<div class="playerlist">
+		<div class="item">
+			<img src="figs/fig-red.svg" />
+			<p>Sebastian</p>
+		</div>
+		<div class="item">
+			<img src="figs/fig-blue.svg" />
+			<p>Sofia</p>
+		</div>
+		<div class="item">
+			<img src="figs/fig-pink.svg" />
+			<p>Sunniva</p>
+		</div>
+	</div>
+	</div>
+	
+	<div id="defeat"  data-show-in-phases="LOST">
+		<h1>Defeat</h1>
+		<div class="background"></div>
+	<div class="playerlist">
+		<div class="item">
+			<img src="figs/fig-red.svg" />
+			<p>Sebastian</p>
+		</div>
+		<div class="item">
+			<img src="figs/fig-blue.svg" />
+			<p>Sofia</p>
+		</div>
+		<div class="item">
+			<img src="figs/fig-pink.svg" />
+			<p>Sunniva</p>
+		</div>
+	</div>
+	</div>
+
+	<audio id="signInSound">
+		<source src="sounds/panel_admin_cardaccept.wav">
+	</audio>
+	<audio id="fileTransferSound">
+		<source src="sounds/panel_nav_chartcourse.wav">
+	</audio>
+	<audio id="fileNotTransferedSound">
+		<source src="sounds/panel_electrical_distributorWrong.wav">
+	</audio>
+
+
+</body>
+</html>
