@@ -10,7 +10,7 @@ public class SimpleGameConfiguration implements GameConfiguration {
     private Duration startDelay = Duration.ofSeconds(5);
     private Duration crunchLength = Duration.ofMinutes(1);
     private LocalTime timeout = LocalTime.of(8, 0);
-    private Duration gameLength = Duration.ofMinutes(500); // Use if timeout is not set, or time has passed (today).
+    private Duration gameLength = Duration.ofMinutes(5); // Use if timeout is not set, or time has passed (today).
 
     @Override
     public long getStartDelayMs() {

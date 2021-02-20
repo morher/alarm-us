@@ -2,12 +2,15 @@ package net.morher.alarmus.state;
 
 public class Task {
     private static int lastId = 0;
-    private final String id;
-    private final String icon;
-    private final String name;
-    private final String type;
+    private String id;
+    private String icon;
+    private String name;
+    private String type;
     private String completeToken;
     private boolean completed;
+
+    public Task() {
+    }
 
     public Task(String icon, String name, String type) {
         this.id = "t-" + Integer.toString(++lastId);

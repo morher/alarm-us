@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class Player {
-    private final String id;
-    private final String displayName;
+    private String id;
+    private String displayName;
     private String color;
     private boolean enabled = true;
     private Collection<Task> criticalTasks = new ArrayList<>();
     private Collection<Task> tasks = new ArrayList<>();
+
+    public Player() {
+    }
 
     public Player(String id, String displayName) {
         this.id = id;
